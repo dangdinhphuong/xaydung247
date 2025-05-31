@@ -46,13 +46,45 @@ npm run dev
   PORT=5000
   ```
 
-### 2. Frontend
+### 2. Frontend (Development)
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 - Mặc định frontend chạy ở `http://localhost:5173`
+
+### 3. Build & Deploy Frontend (Production)
+#### Build project
+```bash
+cd frontend
+npm run build
+```
+- Thư mục `dist` sẽ được tạo ra.
+
+#### Dùng serve để chạy thử bản build
+```bash
+npm install -g serve
+serve -s dist
+```
+- Mặc định chạy ở http://localhost:3000
+
+#### Deploy lên server thực tế (Nginx/Apache...)
+- Copy toàn bộ thư mục `dist` lên server.
+- Cấu hình web server trỏ root về thư mục `dist`.
+
+**Ví dụ cấu hình Nginx:**
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    root /path/to/your/project/dist;
+    index index.html;
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
 
 ## 🌐 API Endpoints
 - `GET /api/products` — Lấy danh sách sản phẩm
