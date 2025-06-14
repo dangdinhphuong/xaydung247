@@ -39,7 +39,7 @@ function initApp() {
     receiptNo: null,
     receiptDate: null,
     async initDatabase() {
-      this.db = await loadDatabase();
+
       this.loadProducts();
     },
     async loadProducts() {
