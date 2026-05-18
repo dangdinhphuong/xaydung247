@@ -1,0 +1,46 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+
+/* PWA Safe Area Support */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+}
+
+/* Ensure viewport uses safe areas */
+body {
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+  padding-right: var(--safe-area-inset-right);
+}
+
+/* Template Preview Styles */
+.template-content {
+  line-height: 1.5;
+}
+
+.template-content h1,
+.template-content h2,
+.template-content h3 {
+  margin: 0;
+  font-weight: bold;
+}
+
+.template-content p {
+  margin: 0;
+}
+
+.template-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.template-content table th,
+.template-content table td {
+  padding: 8px;
+  text-align: left;
+}
