@@ -2,7 +2,7 @@ import { FilteredLink } from './FilteredLink';
 import { Eye, Calendar, CreditCard } from 'lucide-react';
 import { StatusBadge } from './StatusBadge';
 import { Button } from './ui/button';
-import type { Invoice } from '../types/invoice';
+import type { Invoice } from '../types';
 import { formatCurrency, formatDate } from '../utils/formatters';
 
 interface InvoiceCardProps {
@@ -11,7 +11,7 @@ interface InvoiceCardProps {
 }
 
 export function InvoiceCard({ invoice, onPayment }: InvoiceCardProps) {
-  const isOverdue = invoice.status === 'overdue';
+  const isOverdue = invoice.isOverdue;
 
   return (
     <div className="rounded-lg border bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
@@ -25,7 +25,7 @@ export function InvoiceCard({ invoice, onPayment }: InvoiceCardProps) {
           </FilteredLink>
           <p className="mt-1 text-sm text-gray-600">{invoice.customerName}</p>
         </div>
-        <StatusBadge status={invoice.status} />
+        <StatusBadge status={invoice.status} isOverdue={invoice.isOverdue} />
       </div>
 
       <div className="mb-3 space-y-2 border-t pt-3">

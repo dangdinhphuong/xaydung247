@@ -8,10 +8,17 @@
     "default": [
       [
         {
-          "name": "invoice",
+          "name": "FE",
           "autoExecuteCommands": true,
           "commands": [
             "pnpm run dev"
+          ]
+        },
+        {
+          "name": "BE",
+          "autoExecuteCommands": true,
+          "commands": [
+            "cd backend && pnpm run start:dev"
           ]
         }
       ]

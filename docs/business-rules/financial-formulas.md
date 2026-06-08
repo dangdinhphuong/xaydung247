@@ -65,12 +65,18 @@ paidAmount = payments.reduce((sum, p) => sum + p.amount, 0)
 
 MVP không có reversal payment. Cộng dồn đơn giản.
 
+**CANONICAL pattern — KHÔNG dùng cách nào khác:**
+
 Sau mỗi `POST /invoices/:id/payments`, service:
 1. Insert payment vào collection `payments`.
-2. Query lại all payments của invoice → tính `paidAmount`.
-3. `invoice.paidAmount = paidAmount`, `invoice.remainingBalance = total - paidAmount`.
-4. `invoice.status = calculateStatus(total, paidAmount, false, false)`.
-5. Save invoice.
+2. **Query lại toàn bộ payments của invoice** (`paymentModel.find({ invoiceId }).lean()`) — KHÔNG dùng `invoice.paidAmount += dto.amount` trên memory.
+3. `paidAmount = sum(allPayments.amount)`.
+4. **Post-recompute guard (H-4):** nếu `paidAmount > invoice.total` → có race condition (2 payment đồng thời pass validation ban đầu). Throw 422 `DOMAIN-PAID-EXCEEDS-TOTAL`. Payment vừa insert vẫn nằm trong DB → log warning, admin xử lý thủ công (xoá payment dư bằng script ops hoặc void invoice + tạo lại). KHÔNG tự rollback (không có transaction).
+5. `invoice.paidAmount = paidAmount`, `invoice.remainingBalance = invoice.total - paidAmount`.
+6. `invoice.status = calculateStatus(invoice.total, paidAmount, false, false)`.
+7. Save invoice.
+
+**Lý do recompute từ DB:** chống race condition nhẹ — nếu 2 request đồng thời, mỗi request query DB cuối cùng đều thấy đủ payments của cả 2 → sum đúng. Pattern `invoice.paidAmount += amount` trên memory dễ overwrite lẫn nhau.
 
 ---
 
@@ -223,18 +229,36 @@ async function allocateInvoiceNumber(year: number): Promise<string> {
   const settings = await this.settingsService.get()
   const prefix = settings.invoicePrefix  // 'HD-'
 
-  const counter = await this.counterModel.findOneAndUpdate(
-    { _id: `invoice-${year}` },
-    { $inc: { seq: 1 } },
-    { upsert: true, new: true }
-  )
+  let counter
+  try {
+    counter = await this.counterModel.findOneAndUpdate(
+      { _id: `invoice-${year}` },
+      { $inc: { seq: 1 } },
+      { upsert: true, new: true }
+    )
+  } catch (err: any) {
+    // E11000 duplicate key: 2 concurrent upserts cùng insert doc đầu tiên,
+    // 1 trong 2 fail. Retry 1 lần — lúc này doc đã tồn tại, $inc thường.
+    if (err?.code === 11000) {
+      counter = await this.counterModel.findOneAndUpdate(
+        { _id: `invoice-${year}` },
+        { $inc: { seq: 1 } },
+        { new: true }  // KHÔNG upsert ở retry
+      )
+      if (!counter) throw err  // không expect — rethrow để alert
+    } else {
+      throw err
+    }
+  }
 
   const padded = String(counter.seq).padStart(3, '0')
   return `${prefix}${year}-${padded}`  // 'HD-2026-009'
 }
 ```
 
-`findOneAndUpdate` với `upsert: true` là **atomic** trong MongoDB single-document operation. An toàn cho concurrent inserts.
+**Race condition note:** `findOneAndUpdate` với `upsert: true` là **atomic single-document op**, nhưng khi 2 request đồng thời đến lúc counter doc chưa tồn tại, cả 2 cùng thử upsert → 1 trong 2 sẽ throw `E11000 duplicate key`. Code trên catch + retry 1 lần. Sau lần insert đầu tiên thành công, mọi `$inc` về sau là pure atomic — không cần retry.
+
+**Alternative đơn giản hơn:** seed sẵn `{ _id: 'invoice-<currentYear>', seq: 0 }` vào collection `counters` trong `pnpm seed` để loại bỏ hoàn toàn race upsert đầu năm. Mỗi đầu năm mới, admin (hoặc seed migration) thêm row năm tiếp theo.
 
 Cùng cơ chế cho quotation, dùng `_id: \`quotation-${year}\``.
 

@@ -123,14 +123,17 @@ export function PaymentModal({ open, onClose, onSubmit, maxAmount }: PaymentModa
             </Select>
           </div>
 
-          {method === 'bank_transfer' && (
+          {(method === 'bank_transfer' || method === 'check') && (
             <div className="space-y-2">
-              <Label htmlFor="reference">Mã giao dịch</Label>
+              <Label htmlFor="reference">
+                Mã giao dịch <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="reference"
                 placeholder="TF20260223001"
                 value={reference}
                 onChange={(e) => setReference(e.target.value)}
+                required
               />
             </div>
           )}

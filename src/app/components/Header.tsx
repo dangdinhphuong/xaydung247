@@ -1,4 +1,5 @@
-import { Bell, Search, User, Menu as MenuIcon } from 'lucide-react';
+import { Search, User, Menu as MenuIcon, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import {
@@ -9,12 +10,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { useAuth } from '../auth/AuthContext';
+import type { Role } from '../types';
+
+const ROLE_LABELS: Record<Role, string> = {
+  ADMIN: 'Quản trị viên',
+  ACCOUNTANT: 'Kế toán',
+  SALES: 'Nhân viên bán hàng',
+  VIEWER: 'Chỉ xem',
+};
 
 interface HeaderProps {
   onMenuClick?: () => void;
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
+
   return (
     <header className="fixed left-0 right-0 top-0 z-20 h-14 border-b bg-white lg:left-64 lg:h-16">
       <div className="flex h-full items-center justify-between px-4 lg:px-6">
@@ -46,14 +64,6 @@ export function Header({ onMenuClick }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2 lg:gap-4">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-1 top-1 flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
-            </span>
-          </Button>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2">
@@ -61,18 +71,23 @@ export function Header({ onMenuClick }: HeaderProps) {
                   <User className="h-4 w-4" />
                 </div>
                 <div className="hidden text-left md:block">
-                  <div className="text-sm font-medium">Nguyễn Văn An</div>
-                  <div className="text-xs text-gray-500">Quản trị viên</div>
+                  <div className="text-sm font-medium">{user?.fullName ?? 'Người dùng'}</div>
+                  <div className="text-xs text-gray-500">{user ? ROLE_LABELS[user.role] : ''}</div>
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
+              <DropdownMenuLabel>
+                <div>{user?.fullName}</div>
+                <div className="text-xs font-normal text-gray-500">{user?.email}</div>
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Hồ sơ</DropdownMenuItem>
-              <DropdownMenuItem>Cài đặt</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/settings')}>Cài đặt</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Đăng xuất</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Đăng xuất
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

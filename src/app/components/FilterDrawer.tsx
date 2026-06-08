@@ -2,13 +2,12 @@ import { X, Filter } from 'lucide-react';
 import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Label } from './ui/label';
-import type { InvoiceStatus } from '../types';
 
 interface FilterDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  statusFilter: InvoiceStatus | 'all';
-  onStatusChange: (value: InvoiceStatus | 'all') => void;
+  statusFilter: string;
+  onStatusChange: (value: string) => void;
 }
 
 export function FilterDrawer({
@@ -42,7 +41,7 @@ export function FilterDrawer({
         <div className="space-y-4 p-6">
           <div className="space-y-2">
             <Label>Trạng thái hóa đơn</Label>
-            <Select value={statusFilter} onValueChange={(value) => onStatusChange(value as InvoiceStatus | 'all')}>
+            <Select value={statusFilter} onValueChange={(value) => onStatusChange(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Chọn trạng thái" />
               </SelectTrigger>

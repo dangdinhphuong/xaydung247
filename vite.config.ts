@@ -31,6 +31,16 @@ export default defineConfig({
     },
   },
 
+  // Dev server proxy: chuyển /api sang backend NestJS (cùng origin → cookie session + CSRF hoạt động).
+  server: {
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_PROXY || 'http://localhost:3005',
+        changeOrigin: true,
+      },
+    },
+  },
+
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
 })
