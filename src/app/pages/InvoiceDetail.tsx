@@ -16,10 +16,11 @@ import {
 import { StatusBadge } from '../components/StatusBadge';
 import { PaymentModal } from '../components/PaymentModal';
 import { FilteredLink } from '../components/FilteredLink';
-import { useInvoice, useInvoiceMutations } from '../hooks/queries';
+import { useInvoice, useInvoiceMutations, useSettings } from '../hooks/queries';
 import { useAuth } from '../auth/AuthContext';
 import { LoadingState, ErrorState } from '../components/QueryStates';
 import { getErrorMessage } from '../lib/errors';
+import { printInvoiceFromTemplate } from '../lib/printInvoice';
 import { formatCurrency, formatDate } from '../utils/formatters';
 
 const paymentMethodLabels: Record<string, string> = {
@@ -34,7 +35,12 @@ export default function InvoiceDetail() {
   const { hasRole } = useAuth();
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const { data: invoice, isLoading, isError, error, refetch } = useInvoice(id);
+  const { data: settings } = useSettings();
   const { addPayment, finalize, void: voidInvoice } = useInvoiceMutations();
+
+  const handlePrint = () => {
+    if (invoice) printInvoiceFromTemplate(invoice, settings);
+  };
 
   const canPay = hasRole('ADMIN', 'ACCOUNTANT');
   const canFinalize = hasRole('ADMIN', 'ACCOUNTANT');
@@ -99,6 +105,9 @@ export default function InvoiceDetail() {
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-lg font-semibold text-gray-900">{invoice.invoiceNumber ?? '(Nháp)'}</h1>
           </div>
+          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={handlePrint} title="In hóa đơn">
+            <Printer className="h-5 w-5" />
+          </Button>
           <StatusBadge status={invoice.status} isOverdue={invoice.isOverdue} />
         </div>
       </div>
@@ -131,7 +140,7 @@ export default function InvoiceDetail() {
                 Hủy
               </Button>
             )}
-            <Button variant="outline" onClick={() => window.print()}>
+            <Button variant="outline" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" />
               In
             </Button>

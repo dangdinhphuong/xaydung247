@@ -1,17 +1,24 @@
-import { useEffect, useState } from 'react';
-import { Save, FileText } from 'lucide-react';
-import { Link } from 'react-router';
+import { useEffect, useMemo, useState } from 'react';
+import { Save, FileText, Eye, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
+import { Textarea } from '../components/ui/textarea';
 import { Separator } from '../components/ui/separator';
 import { Switch } from '../components/ui/switch';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../components/ui/dialog';
 import { useSettings, useUpdateSettings } from '../hooks/queries';
 import { useAuth } from '../auth/AuthContext';
 import { LoadingState, ErrorState } from '../components/QueryStates';
 import { getErrorMessage } from '../lib/errors';
+import {
+  DEFAULT_INVOICE_TEMPLATE_HTML,
+  SAMPLE_INVOICE,
+  TEMPLATE_PLACEHOLDER_GROUPS,
+} from '../lib/invoiceTemplate';
+import { buildInvoiceHtml } from '../lib/printInvoice';
 import type { AppSettings } from '../types';
 
 export default function Settings() {
@@ -20,10 +27,17 @@ export default function Settings() {
   const { data, isLoading, isError, error, refetch } = useSettings();
   const updateMut = useUpdateSettings();
   const [form, setForm] = useState<AppSettings | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   useEffect(() => {
     if (data) setForm(data);
   }, [data]);
+
+  // HTML xem trước, render template hiện tại (hoặc mẫu mặc định) với hóa đơn mẫu.
+  const previewHtml = useMemo(
+    () => (form ? buildInvoiceHtml(SAMPLE_INVOICE, form) : ''),
+    [form],
+  );
 
   if (isLoading) return <LoadingState label="Đang tải cài đặt..." />;
   if (isError) return <ErrorState error={error} onRetry={() => refetch()} />;
@@ -164,7 +178,90 @@ export default function Settings() {
             )}
           </CardContent>
         </Card>
+
+        {/* Mẫu in hóa đơn (HTML) */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-[#1E88E5]" />
+              Mẫu in hóa đơn (HTML)
+            </CardTitle>
+            <CardDescription>
+              Tùy chỉnh bố cục in hóa đơn bằng HTML. Trường nào có trong mẫu sẽ được thay bằng
+              dữ liệu thật; trường không có thì bỏ qua. Bạn không bắt buộc phải dùng đủ các trường.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Textarea
+              value={form.invoiceTemplateHtml}
+              onChange={(e) => set('invoiceTemplateHtml', e.target.value)}
+              disabled={!canEdit}
+              rows={16}
+              className="font-mono text-xs"
+              placeholder="Dán mã HTML mẫu hóa đơn vào đây..."
+            />
+
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={() => setPreviewOpen(true)}>
+                <Eye className="mr-2 h-4 w-4" />Xem trước
+              </Button>
+              {canEdit && (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => set('invoiceTemplateHtml', DEFAULT_INVOICE_TEMPLATE_HTML)}
+                  >
+                    <RotateCcw className="mr-2 h-4 w-4" />Dùng mẫu mặc định
+                  </Button>
+                  <Button
+                    className="bg-[#1E88E5] hover:bg-[#1976D2]"
+                    disabled={updateMut.isPending}
+                    onClick={() => save(['invoiceTemplateHtml'])}
+                  >
+                    <Save className="mr-2 h-4 w-4" />Lưu mẫu
+                  </Button>
+                </>
+              )}
+            </div>
+
+            <div className="rounded-lg bg-gray-50 p-4 text-sm">
+              <p className="mb-2 font-medium text-gray-700">Placeholder gợi ý (không bắt buộc dùng hết):</p>
+              <div className="space-y-2">
+                {TEMPLATE_PLACEHOLDER_GROUPS.map((g) => (
+                  <div key={g.group}>
+                    <p className="text-xs font-semibold text-gray-500">{g.group}</p>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {g.items.map((it) => (
+                        <code key={it} className="rounded bg-white px-1.5 py-0.5 text-xs text-[#1E88E5] ring-1 ring-gray-200">
+                          {'{{'}{it}{'}}'}
+                        </code>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                <p className="pt-1 text-xs text-gray-500">
+                  Vùng lặp sản phẩm: bọc trong <code className="text-[#1E88E5]">{'{{#items}} ... {{/items}}'}</code> (hoặc <code className="text-[#1E88E5]">{'{{#each items}} ... {{/each}}'}</code>).
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Xem trước mẫu in với dữ liệu hóa đơn mẫu */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Xem trước mẫu in</DialogTitle>
+            <DialogDescription>Hiển thị mẫu hiện tại với dữ liệu hóa đơn mẫu.</DialogDescription>
+          </DialogHeader>
+          <iframe
+            title="Xem trước hóa đơn"
+            srcDoc={previewHtml}
+            className="h-[70vh] w-full rounded border bg-white"
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
