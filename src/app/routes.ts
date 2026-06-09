@@ -12,10 +12,8 @@ import ProductManagement from './pages/ProductManagement';
 import QuotationManagement from './pages/QuotationManagement';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
-import TemplateList from './pages/TemplateList';
-import TemplateBuilder from './pages/TemplateBuilder';
-import TemplateEditorVisual from './pages/TemplateEditorVisual';
-import InvoicePreview from './pages/InvoicePreview';
+import TemplateEditor from './pages/TemplateEditor';
+import TemplateRedirect from './pages/TemplateRedirect';
 import NotFound from './pages/NotFound';
 
 export const router = createBrowserRouter([
@@ -38,10 +36,11 @@ export const router = createBrowserRouter([
           { path: 'products', Component: ProductManagement },
           { path: 'reports', Component: Reports },
           { path: 'settings', Component: Settings },
-          { path: 'settings/templates', Component: TemplateList },
-          { path: 'settings/templates/new', Component: TemplateBuilder },
-          { path: 'settings/templates/:id/edit', Component: TemplateEditorVisual },
-          { path: 'settings/templates/:id/preview', Component: InvoicePreview },
+          // Hệ thống chỉ có 1 mẫu (settings.invoiceTemplateHtml): mọi route template → trình chỉnh sửa duy nhất
+          { path: 'settings/templates/new', Component: TemplateEditor },
+          { path: 'settings/templates/:id/edit', Component: TemplateEditor },
+          { path: 'settings/templates', Component: TemplateRedirect },
+          { path: 'settings/templates/:id/preview', Component: TemplateRedirect },
           { path: '*', Component: NotFound },
         ],
       },
