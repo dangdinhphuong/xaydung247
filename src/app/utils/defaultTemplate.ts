@@ -146,6 +146,14 @@ export const sampleData = {
   Email_Cong_Ty: 'info@vlxdxuonglan.vn',
   Ma_So_Thue_Cong_Ty: '0123456789',
   
+  // Bank & QR
+  Ten_Ngan_Hang: 'MB Bank',
+  So_Tai_Khoan: '190200888888',
+  Chu_Tai_Khoan: 'CỬA HÀNG VLXD XƯƠNG LUÂN',
+  Chi_Nhanh_Ngan_Hang: 'Chi nhánh Sài Gòn',
+  Noi_Dung_Chuyen_Khoan: 'Thanh toan hoa don HD-001',
+  Ma_QR: '<img src="https://img.vietqr.io/image/MB-190200888888-compact.png?amount=45200000&addInfo=Thanh%20toan%20hoa%20don%20HD-001" alt="Mã QR thanh toán" style="max-width: 120px; max-height: 120px; display: block;" />',
+  
   // Customer
   Khach_Hang: 'Anh Hòa Q.1',
   So_Dien_Thoai: '0901 234 567',

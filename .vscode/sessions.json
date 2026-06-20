@@ -1,27 +1,27 @@
 {
-  "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v11/terminal-keeper.json",
-  "theme": "tribe",
-  "active": "default",
-  "activateOnStartup": true,
-  "keepExistingTerminals": false,
-  "sessions": {
-    "default": [
-      [
-        {
-          "name": "FE",
-          "autoExecuteCommands": true,
-          "commands": [
-            "pnpm run dev"
-          ]
-        },
-        {
-          "name": "BE",
-          "autoExecuteCommands": true,
-          "commands": [
-            "cd backend && pnpm run start:dev"
-          ]
-        }
-      ]
-    ]
-  }
+    "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v11/terminal-keeper.json",
+    "theme": "tribe",
+    "active": "default",
+    "activateOnStartup": true,
+    "keepExistingTerminals": false,
+    "sessions": {
+        "default": [
+            [
+                {
+                    "name": "FE",
+                    "autoExecuteCommands": true,
+                    "commands": [
+                        "pnpm run dev"
+                    ]
+                },
+                {
+                    "name": "BE",
+                    "autoExecuteCommands": true,
+                    "commands": [
+                        "cd backend && pnpm run start:dev"
+                    ]
+                }
+            ]
+        ]
+    }
 }

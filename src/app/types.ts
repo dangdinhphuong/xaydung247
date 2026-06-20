@@ -159,6 +159,14 @@ export interface AppSettings {
   defaultTaxRate: number;
   autoTax: boolean;
   invoiceTemplateHtml: string;
+  invoiceTemplatePaperSize?: 'A5' | 'A4' | 'K80';
+  bankName: string;
+  bankAccountNumber: string;
+  bankAccountName: string;
+  bankBranch: string;
+  bankQrEnabled: boolean;
+  bankQrImageUrl: string;
+  bankQrNote: string;
 }
 
 export interface Paginated<T> {

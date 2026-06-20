@@ -41,19 +41,56 @@ async function main() {
       defaultTaxRate: 10,
       autoTax: true,
       invoiceTemplateHtml: DEFAULT_INVOICE_TEMPLATE_HTML,
+      invoiceTemplatePaperSize: 'A5',
+      bankName: '',
+      bankAccountNumber: '',
+      bankAccountName: '',
+      bankBranch: '',
+      bankQrEnabled: false,
+      bankQrImageUrl: '',
+      bankQrNote: 'Thanh toán hóa đơn {{Ma_Hoa_Don}}',
       createdAt: new Date(),
       updatedAt: new Date(),
     });
     console.log('✓ Đã tạo Settings');
   } else {
+    const updates: any = {};
     if (!existingSettings.invoiceTemplateHtml) {
+      updates.invoiceTemplateHtml = DEFAULT_INVOICE_TEMPLATE_HTML;
+    }
+    if (!existingSettings.invoiceTemplatePaperSize) {
+      updates.invoiceTemplatePaperSize = 'A5';
+    }
+    if (existingSettings.bankName === undefined) {
+      updates.bankName = '';
+    }
+    if (existingSettings.bankAccountNumber === undefined) {
+      updates.bankAccountNumber = '';
+    }
+    if (existingSettings.bankAccountName === undefined) {
+      updates.bankAccountName = '';
+    }
+    if (existingSettings.bankBranch === undefined) {
+      updates.bankBranch = '';
+    }
+    if (existingSettings.bankQrEnabled === undefined) {
+      updates.bankQrEnabled = false;
+    }
+    if (existingSettings.bankQrImageUrl === undefined) {
+      updates.bankQrImageUrl = '';
+    }
+    if (existingSettings.bankQrNote === undefined) {
+      updates.bankQrNote = 'Thanh toán hóa đơn {{Ma_Hoa_Don}}';
+    }
+    if (Object.keys(updates).length > 0) {
+      updates.updatedAt = new Date();
       await settingsCol.updateOne(
         { _id: existingSettings._id },
-        { $set: { invoiceTemplateHtml: DEFAULT_INVOICE_TEMPLATE_HTML, updatedAt: new Date() } },
+        { $set: updates },
       );
-      console.log('✓ Đã bổ sung mẫu in hóa đơn mặc định cho Settings');
+      console.log('✓ Đã bổ sung cấu hình mẫu in, khổ giấy và thông tin ngân hàng cho Settings hiện tại');
     } else {
-      console.log('· Settings đã tồn tại, bỏ qua');
+      console.log('· Settings đã tồn tại đầy đủ, bỏ qua');
     }
   }
 

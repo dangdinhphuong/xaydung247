@@ -2,6 +2,12 @@ packages:
   - .
   - backend
 
+# pnpm v11 chặn build script theo mặc định — phê duyệt rõ các gói cần chạy script cài đặt
 allowBuilds:
+  '@nestjs/core': true
   '@tailwindcss/oxide': true
   esbuild: true
+
+# overrides chuyển từ package.json sang đây (pnpm v11 không còn đọc field "pnpm" trong package.json)
+overrides:
+  vite: 6.3.5

@@ -74,6 +74,9 @@ function renderScope(template: string, ctx: Ctx): string {
   // 6. Placeholder thường (escape). Không khớp → ''
   out = out.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (_m, key: string) => {
     const v = ctx[key];
+    if (key === 'Ma_QR' || key === 'Ma_QR_Block') {
+      return v === null || v === undefined ? '' : String(v);
+    }
     return v === null || v === undefined ? '' : escapeHtml(v);
   });
 

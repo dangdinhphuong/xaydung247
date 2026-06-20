@@ -37,6 +37,30 @@ export class Settings {
 
   @Prop({ type: String, default: '' })
   invoiceTemplateHtml: string;
+
+  @Prop({ type: String, default: 'A5', enum: ['A5', 'A4', 'K80'] })
+  invoiceTemplatePaperSize: string;
+
+  @Prop({ type: String, default: '' })
+  bankName: string;
+
+  @Prop({ type: String, default: '' })
+  bankAccountNumber: string;
+
+  @Prop({ type: String, default: '' })
+  bankAccountName: string;
+
+  @Prop({ type: String, default: '' })
+  bankBranch: string;
+
+  @Prop({ type: Boolean, default: false })
+  bankQrEnabled: boolean;
+
+  @Prop({ type: String, default: '' })
+  bankQrImageUrl: string;
+
+  @Prop({ type: String, default: 'Thanh toán hóa đơn {{Ma_Hoa_Don}}' })
+  bankQrNote: string;
 }
 
 export const SettingsSchema = SchemaFactory.createForClass(Settings);

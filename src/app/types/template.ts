@@ -175,6 +175,14 @@ export interface TemplateSampleData {
   Email_Cong_Ty: string;
   Ma_So_Thue_Cong_Ty: string;
   
+  // Bank & QR
+  Ten_Ngan_Hang: string;
+  So_Tai_Khoan: string;
+  Chu_Tai_Khoan: string;
+  Chi_Nhanh_Ngan_Hang: string;
+  Noi_Dung_Chuyen_Khoan: string;
+  Ma_QR: string;
+  
   // Customer
   Khach_Hang: string;
   So_Dien_Thoai: string;

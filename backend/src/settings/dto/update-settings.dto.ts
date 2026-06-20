@@ -69,4 +69,42 @@ export class UpdateSettingsDto {
   @IsString()
   @MaxLength(50000)
   invoiceTemplateHtml?: string;
+
+  @IsOptional()
+  @IsString()
+  invoiceTemplatePaperSize?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  bankName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  bankAccountNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(150)
+  bankAccountName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(150)
+  bankBranch?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  bankQrEnabled?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000000)
+  bankQrImageUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  bankQrNote?: string;
 }
